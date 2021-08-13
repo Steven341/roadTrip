@@ -1,8 +1,6 @@
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStreamReader;
-import java.lang.reflect.Array;
 import java.util.*;
 import java.util.ArrayList;
 
@@ -18,6 +16,9 @@ public class roadTrip {
 
 
     private String[] parse(String data){return data.split(",");}
+    
+    
+    //read roads.csv
     private void parseCities() throws Exception {
         File myObj = new File("roads.csv");
         Scanner myReader = new Scanner(myObj);
@@ -29,7 +30,8 @@ public class roadTrip {
         }
         myReader.close();
     }
-
+    
+    //read attractions.csv
     private void parseAttraction() throws Exception{
         File myObj = new File("attractions.csv");
         Scanner myReader = new Scanner(myObj);
@@ -128,29 +130,30 @@ public class roadTrip {
             }
 
             System.out.println("Here is the best route for your trip: ");
-            route(startingCity,endingCity,attractionsCities);
+            System.out.println(route(startingCity,endingCity,attractionsCities));
             v.clear();
             attractionsCities.clear();
         }
     }
 
-    public void route(String start,String end,ArrayList<String> attractions) throws Exception {
-        ArrayList<String[]> road = new ArrayList<>();
+    public String route(String start,String end,ArrayList<String> attractions) throws Exception {
+        ArrayList<ArrayList> road = new ArrayList<>();
         parseAttraction();
         parseCities();
         graph();
         String prev = start;
         for (String city: attractions){
             graph();
-            System.out.println(compute(v.get(find(prev)),v.get(find(city))));
+            road.add(compute(v.get(find(prev)),v.get(find(city))));
             prev = city;
             v.clear();
         }
         graph();
-        System.out.println(compute(v.get(find(prev)),v.get(find(end))));
+        road.add(compute(v.get(find(prev)),v.get(find(end))));
+        return road.toString();
 
     }
-    private ArrayList<String> compute(Vertex start,Vertex end){
+    private ArrayList<String> compute(Vertex start, Vertex end){
         dpq(start);
         return trace(end);
     }
