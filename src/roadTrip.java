@@ -40,11 +40,13 @@ public class roadTrip {
 
     }
 
-    private void removeRepeat(){
+    private void graph(){
 
         Iterator<String> i = uniqueCities.iterator();
-        while (i.hasNext())
+        while (i.hasNext()){
             v.add(new Vertex(i.next()));
+        }
+
 
         for (int j = 0;j<cities.size()-1;j++){
             String city1 = cities.get(j)[0];
@@ -75,13 +77,15 @@ public class roadTrip {
     public void menu() throws Exception {
         parseCities();
         parseAttraction();
-        removeRepeat();
+        graph();
         while (true){
             BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
             System.out.println("Name of starting city (or EXIT to quit): ");
             startingCity = reader.readLine();
-            if (startingCity.equals("EXIT"))
+            if (startingCity.equals("EXIT")){
+                graph();
                 break;
+            }
             while (!validCity(startingCity)){
                 System.out.println("Invalid City");
                 System.out.println("Name of starting city (or EXIT to quit): ");
@@ -99,8 +103,10 @@ public class roadTrip {
                 Boolean isAdded = false;
                 System.out.println("List an attraction along the way (or ENOUGH to stoplisting): ");
                 attractionPlace = reader.readLine();
-                if (attractionPlace.equals("ENOUGH"))
+                if (attractionPlace.equals("ENOUGH")){
                     break;
+                }
+
                 while (!attractionsHashtable.containsKey(attractionPlace)){
                     System.out.println("Attraction "+ attractionPlace+ " unknown.");
                     System.out.println("List an attraction along the way (or ENOUGH to stoplisting): ");
@@ -122,27 +128,29 @@ public class roadTrip {
             }
 
             System.out.println("Here is the best route for your trip: ");
-
             route(startingCity,endingCity,attractionsCities);
+            v.clear();
+            attractionsCities.clear();
         }
     }
 
     public void route(String start,String end,ArrayList<String> attractions) throws Exception {
+        ArrayList<String[]> road = new ArrayList<>();
         parseAttraction();
+        parseCities();
+        graph();
         String prev = start;
         for (String city: attractions){
-            parseCities();
-            removeRepeat();
+            graph();
             System.out.println(compute(v.get(find(prev)),v.get(find(city))));
             prev = city;
             v.clear();
         }
-        parseCities();
-        removeRepeat();
+        graph();
         System.out.println(compute(v.get(find(prev)),v.get(find(end))));
 
     }
-    public ArrayList<Vertex> compute(Vertex start,Vertex end){
+    private ArrayList<String> compute(Vertex start,Vertex end){
         dpq(start);
         return trace(end);
     }
@@ -159,8 +167,8 @@ public class roadTrip {
 
             for(Edge edge : actualVertex.getAdjacenciesList()){
                 v = edge.getTargetVertex();
+                //if v has not been visited
                 if(!v.isVisited()){
-
                     double newDistance = actualVertex.getDistance() + edge.getWeight();
                     if( newDistance < v.getDistance()){
                         pq.remove(v);
@@ -174,11 +182,12 @@ public class roadTrip {
         }
     }
 
-    private ArrayList<Vertex> trace(Vertex targetVertex){
-        ArrayList<Vertex> path = new ArrayList<>();
+    private ArrayList<String> trace(Vertex targetVertex){
+        ArrayList<String> path = new ArrayList<>();
         //iterate through vertex and add to arraylist
-        for(Vertex vertex=targetVertex;vertex!=null;vertex=vertex.getPredecessor())
-            path.add(vertex);
+        for(Vertex vertex=targetVertex;vertex!=null;vertex=vertex.getPredecessor()){
+            path.add(vertex.getName());
+        }
         //reverse arraylist
         Collections.reverse(path);
         return path;
@@ -189,6 +198,7 @@ public class roadTrip {
     public static void main(String[] args) throws Exception {
 
         roadTrip r = new roadTrip();
+        r.menu();
         ArrayList<String> cities = new ArrayList<>();
         cities.add("Boston MA");
         cities.add("Cleveland OH");

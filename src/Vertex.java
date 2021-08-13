@@ -7,6 +7,7 @@ public class Vertex implements Comparable<Vertex> {
     private List<Edge> adjacenciesList;
     private boolean visited;
     private Vertex predecessor;
+    private Vertex addedPredecessor;
     private double distance = Double.MAX_VALUE;
 
     public Vertex(String name) {
@@ -48,6 +49,10 @@ public class Vertex implements Comparable<Vertex> {
 
     public void setPredecessor(Vertex predecessor) {
         this.predecessor = predecessor;
+    }
+
+    public void reset(){
+        this.addedPredecessor = this.predecessor;
     }
 
     public double getDistance() {
